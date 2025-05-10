@@ -21,23 +21,23 @@ func parsePackage(data string) (int, time.Duration, error) {
 
 	parts := strings.Split(data, ",") //Разделение строки на слайс строк
 	if len(parts) != 2 {              //проверка длины слайса
-		return 0, 0, fmt.Errorf("Неверный формат")
+		return 0, 0, fmt.Errorf("invalid format")
 	}
 	firstElement := parts[0]                 //первая часть. количество шагов
 	steps, err := strconv.Atoi(firstElement) // преобразование в int
 	if err != nil {
-		return 0, 0, fmt.Errorf("Неверное количество шагов")
+		return 0, 0, fmt.Errorf("conversion error: %w", err)
 	}
 	if steps <= 0 {
-		return 0, 0, fmt.Errorf("Количество шагов должно быть больше 0")
+		return 0, 0, fmt.Errorf("the number of steps must be greater than 0")
 	}
 	durationOfTheWalk := parts[1]                          // вторая часть. продолжительность прогулки
 	duration, err := time.ParseDuration(durationOfTheWalk) // строка в time.Duration
 	if err != nil {
-		return 0, 0, fmt.Errorf("Неверный формат продолжительности прогулки")
+		return 0, 0, fmt.Errorf("conversion error: %w", err)
 	}
 	if duration <= 0 {
-		return 0, 0, fmt.Errorf("Продолжительность прогулки должна быть больше 0")
+		return 0, 0, fmt.Errorf("the duration of the walk should be more than 0")
 	}
 	return steps, duration, nil
 }
@@ -47,7 +47,7 @@ func DayActionInfo(data string, weight, height float64) string {
 
 	steps, duration, err := parsePackage(data) //данные о шагах и продолж.прогулки
 	if err != nil {
-		log.Println("Ошибка ввода данных")
+		log.Println(err)
 		return ""
 	}
 	if steps <= 0 {

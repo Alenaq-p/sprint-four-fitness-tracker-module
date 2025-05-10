@@ -22,27 +22,27 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 
 	parts := strings.Split(data, ",") //Разделение строки на слайс строк
 	if len(parts) != 3 {              //проверка длины слайса
-		return 0, "", 0, fmt.Errorf("Неверный формат")
+		return 0, "", 0, fmt.Errorf("invalid format")
 	}
 	firstElement := parts[0]                 //1 часть. количество шагов
 	steps, err := strconv.Atoi(firstElement) // преобразование в int
 	if err != nil {
-		return 0, "", 0, fmt.Errorf("Неверное количество шагов")
+		return 0, "", 0, fmt.Errorf("conversion error: %w", err)
 	}
 	if steps <= 0 {
-		return 0, "", 0, fmt.Errorf("Количество шагов должно быть больше 0")
+		return 0, "", 0, fmt.Errorf("the number of steps must be greater than 0")
 	}
 	activity := parts[1] //2 часть. активность
 	if activity == "" {
-		return 0, "", 0, fmt.Errorf("Неверный формат активности")
+		return 0, "", 0, fmt.Errorf("invalid activity format")
 	}
 	durationOfTheWalk := parts[2]                          // 3 часть строки. продолжительность прогулки
 	duration, err := time.ParseDuration(durationOfTheWalk) // строка в time.Duration
 	if err != nil {
-		return 0, "", 0, fmt.Errorf("Неверный формат продолжительности прогулки")
+		return 0, "", 0, fmt.Errorf("invalid walk duration format")
 	}
 	if duration <= 0 {
-		return 0, "", 0, fmt.Errorf("Продолжительность прогулки должна быть больше 0")
+		return 0, "", 0, fmt.Errorf("the duration of the walk should be more than 0")
 	}
 	return steps, activity, duration, nil
 }
@@ -73,14 +73,15 @@ func meanSpeed(steps int, height float64, duration time.Duration) float64 {
 func TrainingInfo(data string, weight, height float64) (string, error) {
 
 	if weight <= 0 {
-		return "", fmt.Errorf("Вес должен быть больше 0")
-	} else if height <= 0 {
-		return "", fmt.Errorf("Рост должен быть больше 0")
+		return "", fmt.Errorf("weight must be greater than 0")
+	}
+	if height <= 0 {
+		return "", fmt.Errorf("height must be greater than 0")
 	}
 
 	steps, activity, duration, err := parseTraining(data)
 	if err != nil {
-		return "", fmt.Errorf("Ошибка данных: %w", err)
+		return "", fmt.Errorf("data error: %w", err)
 	}
 
 	distance := distance(steps, height)
@@ -92,11 +93,11 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 	case activity == activity_run:
 		calories, err = RunningSpentCalories(steps, weight, height, duration)
 	default:
-		return "", fmt.Errorf("неизвестный тип тренировки")
+		return "", fmt.Errorf("unknown training type")
 	}
 
 	if err != nil {
-		return "", fmt.Errorf("Ошибка данных: %w", err)
+		return "", fmt.Errorf("data error: %w", err)
 	}
 
 	sample := "Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f\n"
@@ -107,16 +108,16 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 // RunningSpentCalories возвращает количество калорий, потраченных при беге.
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if duration <= 0 {
-		return 0, fmt.Errorf("Продолжительность прогулки должна быть больше 0")
+		return 0, fmt.Errorf("the duration of the walk should be more than 0")
 	}
 	if steps <= 0 {
-		return 0, fmt.Errorf("Количество шагов должно быть больше 0")
+		return 0, fmt.Errorf("the number of steps must be greater than 0")
 	}
 	if weight <= 0 {
-		return 0, fmt.Errorf("Вес должен быть больше 0")
+		return 0, fmt.Errorf("weight must be greater than 0")
 	}
 	if height <= 0 {
-		return 0, fmt.Errorf("Рост должен быть больше 0")
+		return 0, fmt.Errorf("height must be greater than 0")
 	}
 	meanSpeed := meanSpeed(steps, height, duration)
 	durationInMinutes := duration.Minutes()
@@ -127,16 +128,16 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 // WalkingSpentCalories возвращает количество калорий, потраченных при ходьбе
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if duration <= 0 {
-		return 0, fmt.Errorf("Продолжительность прогулки должна быть больше 0")
+		return 0, fmt.Errorf("the duration of the walk should be more than 0")
 	}
 	if steps <= 0 {
-		return 0, fmt.Errorf("Количество шагов должно быть больше 0")
+		return 0, fmt.Errorf("the number of steps must be greater than 0")
 	}
 	if weight <= 0 {
-		return 0, fmt.Errorf("Вес должен быть больше 0")
+		return 0, fmt.Errorf("weight must be greater than 0")
 	}
 	if height <= 0 {
-		return 0, fmt.Errorf("Рост должен быть больше 0")
+		return 0, fmt.Errorf("height must be greater than 0")
 	}
 	meanSpeed := meanSpeed(steps, height, duration)
 	durationInMinutes := duration.Minutes()
